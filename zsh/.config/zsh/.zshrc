@@ -78,7 +78,7 @@ autoload edit-command-line; zle -N edit-command-line
 
 # TODO Remove these
 setxkbmap -option caps:escape
-xset r rate 210 40
+#xset r rate 210 40
 
 # Speedy keys
 # xset r rate 210 40
@@ -95,3 +95,6 @@ export QT_QPA_PLATFORMTHEME=qt5ct
 # setxkbmap -option caps:escape
 # swap escape and caps
 # setxkbmap -option caps:swapescape
+
+# ufetch
+ufetch | lolcat

@@ -1,5 +1,6 @@
 # Random Photo Every Login
 # feh --bg-scale --randomize ~/Pictures/wallpapers/* &
+systemctl --user start X.target
 
 # Monitor Config
 #xrandr --auto --output DVI-D-0 --mode 1920x1080 --left-of HDMI-0
@@ -13,7 +14,7 @@ xset -dpms
 xset s noblank
 
 # Speedy keys
-xset r rate 210 40
+#xset r rate 210 40
 
 # Environment variables set everywhere
 export EDITOR="nvim"
@@ -29,7 +30,8 @@ export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
 
 # Compositor
-picom -b
+#picom -b
+picom --config $HOME/.config/picom/picom-ibhagwan.conf &
 
 # Hide mouse when typing
 xbanish &

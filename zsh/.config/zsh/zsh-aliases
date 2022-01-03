@@ -3,6 +3,8 @@ alias j='z'
 alias f='zi'
 alias g='lazygit'
 alias stow='stow -t ~'
+alias cat='bat'
+alias wr='systemctl --user daemon-reload'
 alias zsh-update-plugins="find "$ZDOTDIR/plugins" -type d -exec test -e '{}/.git' ';' -print0 | xargs -I {} -0 git -C {} pull -q"
 alias nvimrc='nvim ~/.config/nvim/'
 

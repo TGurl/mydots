@@ -2,13 +2,7 @@
 
 pgrep -x sxhkd > /dev/null || sxhkd &
 
-$HOME/.fehbg
-systemctl --user start X.target
-unclutter &
-
 bspc monitor -d I II III IV V VI VII VIII IX X
-
-$HOME/.config/polybar/launch.sh &
 
 bspc config border_width         1
 bspc config window_gap           2
@@ -23,4 +17,5 @@ bspc rule -a mplayer2 state=floating
 bspc rule -a Kupfer.py focus=on
 bspc rule -a Screenkey manage=off
 
-picom --config $HOME/.config/picom/picom-ibhagwan.conf
+$HOME/.fehbg
+$HOME/.config/polybar/launch.sh &
