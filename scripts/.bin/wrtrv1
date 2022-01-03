@@ -1,0 +1,139 @@
+#!/usr/bin/env python
+#
+# a simple writing companion
+#
+import os
+import sys
+import random
+from shutil import copy2
+
+
+def clear():
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
+
+
+def wait_for_enter():
+    _ = input('')
+
+
+def readlist(filename: str) -> list:
+    """Read contents of file and return it as a list"""
+    home = os.path.expanduser('~')
+    path = f"{home}/.local/share/wrtr/{filename}.lst"
+    data = []
+    with open(path) as file:
+        data = file.read().splitlines()
+    return data
+
+
+def choose(what='f'):
+    chosen = ''
+    if what == 'f':
+        chosen = random.choice(readlist('girlnames'))
+    if what == 'm':
+        chosen = random.choice(readlist('boynames'))
+    if what == 'h':
+        chosen = random.choice(readlist('hotres'))
+    if what == 'b':
+        chosen = random.choice(readlist('bnb'))
+    if what == 's':
+        chosen = random.choice(readlist('streets'))
+    if what == 't':
+        chosen = random.choice(readlist('towns'))
+    print(f">>> {chosen}")
+    wait_for_enter()
+
+
+def show_menu() -> str:
+    """Generate menu and return user input as string"""
+    options = [
+            'girl name',
+            'boy name',
+            'hotel/resort name',
+            'b&b name',
+            'street name',
+            'town name',
+            ]
+    allowed = []
+    clear()
+    # print('WRTR')
+    # print('----')
+    # print()
+
+    for c, item in enumerate(options):
+        print(f"{c + 1}. {item}")
+        allowed.append(str(c + 1))
+
+    allowed.extend(['q', 't', 'c'])
+
+    print()
+    print('c. convert C to F')
+    print('t. copy template')
+    print('q. exit')
+
+    answer = ''
+    while answer not in allowed:
+        answer = input("> ")
+
+    return answer
+
+
+def c_to_f():
+    celsius = input('Celius: ')
+    fahrenheit = (int(celsius) * 9/5) + 32
+    print(f">> {fahrenheit}")
+    _ = input('')
+
+
+def copy_template():
+    home = os.path.expanduser('~')
+    src = f"{home}/.local/share/wrtr/template.md"
+
+    _name = input("New filename without .md : ")
+    newname = _name + ".md"
+    notes = _name + ".notes.yaml"
+
+    curpath = os.getcwd()
+    dst = os.path.join(curpath, newname)
+    nts = os.path.join(curpath, notes)
+
+    copy2(src, dst)
+    file = open(nts, "w+")
+    file.write(f"# {newname} notes\r\n")
+    file.write(f"\r\n");
+    file.close()
+
+    print(f"> Template copied to {newname}")
+    print(f"> Notes file created: {notes}")
+    wait_for_enter()
+
+
+def main():
+    """The main loop"""
+    answer = show_menu()
+
+    if answer == 'q':
+        sys.exit(0)
+    elif answer == 't':
+        copy_template()
+    elif answer == 'c':
+        c_to_f()
+    elif int(answer) == 1:
+        choose('f')
+    elif int(answer) == 2:
+        choose('m')
+    elif int(answer) == 3:
+        choose('b')
+    elif int(answer) == 4:
+        choose('h')
+    elif int(answer) == 5:
+        choose('s')
+    elif int(answer) == 6:
+        choose('t')
+
+if __name__ == '__main__':
+    while True:
+        main()

@@ -1,0 +1,49 @@
+#!/usr/bin/env python
+"""
+A simple script that checks if aur packages need updates
+"""
+
+import os
+import subprocess
+
+
+def fast_scandir(path) -> list:
+    """scans a path for its folders"""
+    subfolders = [f.path for f in os.scandir(path) if f.is_dir()]
+    return subfolders
+
+
+def main():
+    """the main loop"""
+    os.system('clear')
+    cmd = "git pull"
+    folders = fast_scandir('.')
+    folders.sort()
+    CRED = '\033[31m'
+    CGRE = '\033[32m'
+    CEND = '\033[0m'
+
+    OK = f"{CGRE}OK{CEND}"
+    NOK = f"{CRED}Outdated!{CEND}"
+
+    print('{:<35} {:<10}'.format('Folder', 'Status'))
+    print("-"*48)
+
+    denied = []
+
+    for folder in folders:
+        os.chdir(folder)
+        _ = folder.split('/')
+        name = _[1]
+        if not name.startswith('.') and name not in denied:
+            output = subprocess.getoutput(cmd)
+            if output == "Already up to date.":
+                print("{:.<35} {:<10}".format(name, OK))
+            else:
+                print("{:.<35} {:<10}".format(name, NOK))
+
+        os.chdir('..')
+
+
+if __name__ == "__main__":
+    main()

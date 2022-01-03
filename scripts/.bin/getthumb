@@ -1,0 +1,69 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+# --skip-download
+#   Do not download video
+#
+# --write-thumbnail
+#   Write thumbnail image to disk
+#
+# --write-all-thumbnails
+#   Write all thumbnail image formats to disk
+#
+# --list-thumbnails
+#   Simulate and list all available thumbnail formats
+
+def run(what: str, url: str):
+    command = 'youtube-dl --skip-download '
+    if what == 'list':
+        command += '--list-thumbnails '
+    elif what == 'dl':
+        command += '--write-thumbnail '
+    elif what == 'all':
+        command += '--write-all-thumbnails '
+    command += url
+    # print('==>', command)
+    os.system(command)
+    sys.exit(0)
+
+
+def extract_url(mylist):
+    if len(mylist) == 0:
+        args, url = None
+        return args, url
+
+    for ml in mylist:
+        if ml.startswith('https://www.youtube.com'):
+            url = ml
+            mylist.remove(url)
+        else:
+            url = None
+    
+    return mylist, url
+
+
+def main(sysargs):
+    args, url = extract_url(sysargs)
+
+    if url is None:
+        print('getthumb >> That might be an URL but it\'s not a YouTube one...')
+        sys.exit(1)
+
+    if len(args) == 0:
+        args = ['-d']
+
+    for arg in args:
+        if arg.lower() == '--list' or arg == '-l':
+            run('list', url)
+        elif arg.lower() == '--dl' or arg == '-d':
+            run('dl', url)
+        elif arg.lower() == '--all' or arg == '-a':
+            run('all', url)
+        else:
+            print("getthumb >> Unknown argument given...")
+
+
+if __name__ == "__main__":
+    main(sys.argv[1:])

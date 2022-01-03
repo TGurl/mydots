@@ -1,0 +1,68 @@
+theme = "slick"
+#theme = 'gruvbox-dark'
+
+#icons = "material"
+icons = "awesome5"
+
+[[block]]
+block = "disk_space"
+path = "/"
+alias = "/"
+info_type = "available"
+interval = 20
+warning = 20.0
+alert = 10.0
+
+[[block]]
+block = "memory"
+display_type = "memory"
+format_mem = "{mem_used_percents}"
+format_swap = "{swap_used_percents}"
+icons = true
+clickable = false
+interval = 1
+warning_mem = 80
+warning_swap = 80
+critical_mem = 95
+critical_swap = 95
+
+[[block]]
+block = "cpu"
+interval = 1
+
+[[block]]
+block = "load"
+interval = 1
+format = "{1m}"
+
+#[[block]]
+#block = "weather"
+#format = "{weather} ({location}) {temp}, {wind} m/s"
+#service = { name = "openweathermap", api_key = "91e386f5a375d5fbf31ff164b4291823", city_id = "2759794", units = "metric" }
+
+[[block]]
+block = "time"
+interval = 5
+format = "%a %d/%m %l:%M %p"
+
+[[block]]
+# Updates every 8 hours
+block = "pacman"
+interval = 28800
+hide_when_uptodate = true
+format = "{pacman} updates"
+format_singular = "{pacman} update"
+format_up_to_date = "up to date"
+critical_updates_regex = "(linux|linux-lts|linux-zen)"
+# pop-up a menu showing the available updates. Replace wofi with
+# your favourite menu command.
+#on_click = "fakeroot pacman -Qu --dbpath /tmp/checkup-db-geertje/ |     rofi -show dmenu"
+
+[[block]]
+block = "sound"
+
+[[block]]
+block = "custom"
+command = "echo \uf011"
+on_click = "/home/geertje/.bin/powermenu.sh"
+interval = "once"

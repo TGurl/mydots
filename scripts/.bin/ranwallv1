@@ -1,0 +1,87 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import random
+
+from subprocess import Popen, PIPE
+#from time import sleep
+
+def get_current_wallpaper():
+    path = "/home/geertje/.fehbg"
+    with open(path, 'r') as feh_file:
+        data = feh_file.read().splitlines()
+    line = data[1].split(" ")
+    path = line[3].replace("'", "")
+    return path.split('/')[-1]
+
+
+def get_wallpapers(walltype: str):
+    folders = []
+    walls = []
+    if walltype.lower() == 'all':
+        folders.append('sfw')
+        folders.append('nsfw')
+    else:
+        folders.append(walltype)
+
+    for fname in folders:
+        folder = os.path.join('/data/pictures/walls', fname)
+        for (dirpath, dirnames, filenames) in os.walk(folder):
+            _ = dirnames
+            walls += [os.path.join(dirpath, file) for file in filenames]
+
+    walls.sort()
+
+    return walls
+
+
+def set_wall(walltype: str):
+    current = get_current_wallpaper().replace("'", '')
+    walls = get_wallpapers(walltype)
+
+    disallowed = ['empty', 'README.md', current]
+    wallname = 'empty'
+    wallpaper = ''
+    while wallname in disallowed:
+        wallpaper = random.choice(walls)
+        wallname = wallpaper.split("/")[-1]
+
+    destination = "/usr/share/sddm/themes/mywall/Backgrounds/mywall.png"
+
+    if ".png" in wallname:
+        sudo_cmd = f"cp {wallpaper} {destination}".split()
+    else:
+        sudo_cmd = f"convert {wallpaper} {destination}".split()
+
+    with open('/home/geertje/.config/ranwall/pword.txt') as file:
+        sudo_pass = file.read().splitlines()[0]
+
+    feh_cmd = f"feh --bg-scale {wallpaper}"
+    os.system(feh_cmd)
+
+    args = ['sudo', '-S']
+    p = Popen(args + sudo_cmd,
+            stdin=PIPE,
+            stderr=PIPE,
+            universal_newlines=True)
+    _ = p.communicate(sudo_pass + '\n')[1]
+    print(_)
+
+
+def main(walltype: str):
+    allowed=['all', 'sfw', 'nsfw']
+    if walltype.lower() not in allowed:
+        print(">> Please use either 'all', 'sfw' or 'nsfw'.")
+        print("   Program halted.")
+        sys.exit(1)
+
+    set_wall(walltype)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("Please specify a category: all, sfw or nsfw.")
+        sys.exit(1)
+
+    main(sys.argv[1])

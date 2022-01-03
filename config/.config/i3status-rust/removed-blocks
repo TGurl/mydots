@@ -1,0 +1,12 @@
+[[block]]
+ 45 block = "pacman"
+ 46 interval = 600
+ 47 hide_when_uptodate = true
+ 48 format = "{pacman} updates"
+ 49 format_singular = "{pacman} update"
+ 50 format_up_to_date = "up to date"
+ 51 critical_updates_regex = "(linux|linux-lts|linux-zen)"
+ 52 # pop-up a menu showing the available updates. Replace wofi with
+ 53 # your favourite menu command.
+ 54 #on_click = "fakeroot pacman -Qu --dbpath /tmp/checkup-db-geertje/ |     rofi -show dmenu"
+

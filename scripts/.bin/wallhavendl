@@ -1,0 +1,343 @@
+#!/usr/bin/env python
+
+"""
+A simple image downloader from Wallhaven.cc
+"""
+
+import random
+import string
+import os
+import re
+import requests
+import subprocess
+
+from dataclasses import dataclass
+
+
+class Colors:
+    """
+    Colors for the CLI
+    Usage:
+        print(colors.fgRed + "Text" + colors.reset)
+    """
+    reset = "\033[0m"
+    # Black
+    fgBlack = "\033[30m"
+    fgBrightBlack = "\033[30;1m"
+    bgBlack = "\033[40m"
+    bgBrightBlack = "\033[40;1m"
+    # Red
+    fgRed = "\033[31m"
+    fgBrightRed = "\033[31;1m"
+    bgRed = "\033[41m"
+    bgBrightRed = "\033[41;1m"
+    # Green
+    fgGreen = "\033[32m"
+    fgBrightGreen = "\033[32;1m"
+    bgGreen = "\033[42m"
+    bgBrightGreen = "\033[42;1m"
+    # Yellow
+    fgYellow = "\033[33m"
+    fgBrightYellow = "\033[33;1m"
+    bgYellow = "\033[43m"
+    bgBrightYellow = "\033[43;1m"
+    # Blue
+    fgBlue = "\033[34m"
+    fgBrightBlue = "\033[34;1m"
+    bgBlue = "\033[44m"
+    bgBrightBlue = "\033[44;1m"
+    # Magenta
+    fgMagenta = "\033[35m"
+    fgBrightMagenta = "\033[35;1m"
+    bgMagenta = "\033[45m"
+    bgBrightMagenta = "\033[45;1m"
+    # Cyan
+    fgCyan = "\033[36m"
+    fgBrightCyan = "\033[36;1m"
+    bgCyan = "\033[46m"
+    bgBrightCyan = "\033[46;1m"
+    # White
+    fgWhite = "\033[37m"
+    fgBrightWhite = "\033[37;1m"
+    bgWhite = "\033[47m"
+    bgBrightWhite = "\033[47;1m"
+
+
+@dataclass
+class Settings:
+    api_key: str
+    api_url: str
+    categories: str
+    purity: str
+    colors: str
+    query: str
+    sorting: str
+    atleast: str
+    order: str
+    ratios: str
+    sfw: bool
+    sketchy: bool
+    nsfw: bool
+    resolution: bool
+    general: bool
+    anime: bool
+    people: bool
+    aspect16x9: bool
+    basedir: str
+
+
+def clear():
+    if os.name == 'nt':
+        os.system('cls')
+    else:
+        os.system('clear')
+
+
+def construct_api_url():
+    seed = ''.join(random.choices(
+        string.ascii_uppercase + string.digits, k=10))
+    apiurl = "https://wallhaven.cc/api/v1/search?" \
+        + "apikey=" + Settings.api_key + "&" \
+        + "q=" + Settings.query + "&" \
+        + "categories=" + Settings.categories + "&" \
+        + "purity=" + Settings.purity + "&" \
+        + "colors=" + Settings.colors + "&" \
+        + "sorting=" + Settings.sorting + "&" \
+        + "atleast=" + Settings.atleast + "&" \
+        + "ratios=" + Settings.ratios + "&" \
+        + "seed=" + seed
+    return apiurl
+
+
+def set_defaults():
+    Settings.colors = ''
+    Settings.sorting = 'random'
+    Settings.order = 'asc'
+    Settings.api_key = "T52VzHkgEfpJiHTXa9KWujymq3LC2EK0"
+    Settings.basedir = "/data/pictures/walls/downloads"
+
+
+def set_optionals():
+    categories = list('000')
+    if Settings.general:
+        categories[0] = '1'
+    if Settings.anime:
+        categories[1] = '1'
+    if Settings.people:
+        categories[2] = '1'
+
+    purity = list('000')
+    if Settings.sfw:
+        purity[0] = '1'
+    if Settings.sketchy:
+        purity[1] = '1'
+    if Settings.nsfw:
+        purity[2] = '1'
+
+    Settings.purity = ''.join(purity)
+    Settings.categories = ''.join(categories)
+
+    if Settings.aspect16x9:
+        Settings.ratios = "16x9"
+    else:
+        Settings.ratios = ""
+
+    if Settings.resolution:
+        Settings.atleast = get_screen_dimensions()
+    else:
+        Settings.atleast = ""
+
+
+def get_screen_dimensions():
+    screenheight = "0"
+    screenwidth = "0"
+    xrandrOutput = str(subprocess.Popen(
+        ['xrandr'], stdout=subprocess.PIPE).communicate()[0])
+    matchObj = re.findall(r'current\s(\d+) x (\d+)', xrandrOutput)
+    if matchObj:
+        screenwidth = str(int(matchObj[0][0]))
+        screenheight = str(int(matchObj[0][1]))
+    return screenwidth + "x" + screenheight
+
+
+def yesno(question, default_no=False):
+    yel = Colors.fgBrightYellow
+    res = Colors.reset
+    if default_no:
+        choices = f"[y/{yel}N{res}]: "
+        default_answer = 'n'
+    else:
+        choices = f"[{yel}Y{res}/n]: "
+        default_answer = 'y'
+
+    msg = f"{question}{choices}"
+    reply = input(msg).lower() or default_answer
+    match reply:
+        case 'y'|'yes': return True
+        case 'n'|'no': return False
+
+
+def show_title():
+    yel = Colors.fgBrightYellow
+    res = Colors.reset
+    clear()
+    print("------------------------------------")
+    print(f" {yel}Wallhaven.cc Image Downloader v3.0{res}")
+    print("------------------------------------")
+
+
+def questionaire():
+    show_title()
+    query = input("What should I search for? : ")
+
+    if query.lower() in ['q', 'quit']:
+        print("Okay, okay, okay. Bye!")
+        exit()
+
+    maxcount = input("How many rounds should I search for? : ")
+    Settings.general = yesno("Enable General? : ", default_no=False)
+    Settings.anime = yesno("Enable Anime? : ", default_no=True)
+    Settings.people = yesno("Enable People? : ", default_no=False)
+    Settings.sfw = yesno("Enable SWF? : ", default_no=False)
+    Settings.sketchy = yesno("Enable Sketchy? : ", default_no=False)
+    Settings.nsfw = yesno("Enable NSFW? : ", default_no=False)
+    Settings.aspect16x9 = yesno("Only 16x9? : ", default_no=False)
+    _res = get_screen_dimensions()
+    Settings.resolution = yesno(
+        f"Minimal resolution {_res}? : ", default_no=True)
+
+    return maxcount, query
+
+
+def fetch_json():
+    response = requests.get(Settings.api_url)
+    return response.json()
+
+
+def info(msg):
+    blu = Colors.fgBrightBlue
+    res = Colors.reset
+    print(f"{blu}==>{res} {msg}")
+
+
+def error(msg):
+    red = Colors.fgBrightRed
+    res = Colors.reset
+    print(f"-> {red}{msg}{res}")
+
+
+def warning(msg):
+    gre = Colors.fgBrightGreen
+    res = Colors.reset
+    print(f"{gre}=>{res} {msg}")
+
+
+def message(msg, nl=True):
+    yel = Colors.fgBrightYellow
+    res = Colors.reset
+    if not nl:
+        print(f"{yel}=>{res} {msg}", end='')
+    else:
+        print(f"{yel}=>{res} {msg}")
+
+
+def write_image(image_url, filename):
+    path = os.path.join(Settings.basedir, filename)
+    img_data = requests.get(image_url).content
+    with open(path, 'wb') as handler:
+        handler.write(img_data)
+    return True
+
+
+def parse_data(data):
+    yel = Colors.fgBrightYellow
+    gre = Colors.fgBrightGreen
+    res = Colors.reset
+
+    for count, d in enumerate(data):
+        url = d['path']
+        temp = url.replace('https://', '')
+        temp = temp.split("/")
+        filename = temp[3]
+        c = count + 1
+        message(f"Writing image {yel}{c:02d}{res}/{yel}24{res} ", nl=False)
+        path = os.path.join(Settings.basedir, filename)
+        if os.path.isfile(path) or os.path.islink(path):
+            error(f"{filename}.")
+        else:
+            print(f"-> {gre}{filename}{res}.")
+            write_image(url, path)
+
+
+def main_loop():
+    gre = Colors.fgBrightGreen
+    yel = Colors.fgBrightYellow
+    res = Colors.reset
+
+    set_defaults()
+    show_title()
+    maxcount, query = questionaire()
+
+    if maxcount == '0' or maxcount == '':
+        maxcount = 2
+    else:
+        maxcount = int(maxcount)
+
+    Settings.query = query.lower().strip()
+    set_optionals()
+    Settings.api_url = construct_api_url()
+
+    count = 1
+    while count <= maxcount:
+        clear()
+        show_title()
+        data = fetch_json()['data']
+        if len(data) == 0:
+            error('No results found...')
+            return None
+
+        if len(data) < 24:
+            maxcount = 1
+
+        info(f"Query: {gre}{Settings.query}{res}")
+        info(f"Round: {yel}{count:02d}{res}/{yel}{maxcount:02d}{res}")
+        parse_data(data)
+        count += 1
+
+    clear()
+    show_title()
+    print("Done!")
+
+
+def delete_images():
+    path = Settings.basedir
+    delete = yesno("Delete images?", default_no=True)
+
+    if delete:
+        jpg_files = [f for f in os.listdir(path) if f.endswith('.jpg')]
+        png_files = [f for f in os.listdir(path) if f.endswith('.png')]
+
+        image_list = []
+        image_list.extend(jpg_files)
+        image_list.extend(png_files)
+
+        for image in image_list:
+            if os.path.isfile(image) or os.path.islink(image):
+                os.unlink(image)
+        return True
+    else:
+        return False
+
+
+def main():
+    running = True
+    while running:
+        main_loop()
+        #_ = delete_images()
+        running = yesno("Want to go again?", default_no=False)
+    print(running)
+    exit()
+
+
+if __name__ == "__main__":
+    main()

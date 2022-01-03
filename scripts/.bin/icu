@@ -1,0 +1,65 @@
+#!/usr/bin/env python
+
+# -----------------------------------------------------------
+#                    ___      ___ ___
+#                   |   .----|   Y   |
+#                   |.  |  __|.  |   |
+#                   |.  |____|.  |   |
+#                   |:  |    |:  1   |
+#                   |::.|    |::.. . |
+#                   `---'    `-------'
+#                    Image Create Unit
+# -----------------------------------------------------------
+
+import os
+from pilkit.utils import save_image
+from pilkit.processors import Image, ResizeToFit, Thumbnail
+
+
+class Colors:
+    red = "\033[31;1m"
+    yellow = "\033[33;1m"
+    green = "\033[32;1m"
+    reset = "\033[0m"
+
+
+def show_tui():
+    os.system('clear')
+    print("{Colors.yellow}----- IcU -----{Colors.reset}")
+    print()
+
+
+def get_image_list(src):
+    files = []
+    for file in os.listdir(src):
+        if file.endswith('jpg') or file.endswith('jpeg') or file.endswith('png'):
+            files.append(file)
+    return files
+
+
+def create_thumbs(image_list, src):
+    image_list.sort()
+    src_dir = os.path.join(os.getcwd(), src)
+
+    for image in image_list:
+        thumb_name = f"th_{image}"
+        src_image = os.path.join(src_dir, image)
+        dst_image = os.path.join(src_dir, thumb_name)
+        print(f">> {Colors.yellow}Processing {image}{Colors.reset} ... ", end='')
+        img = Image.open(src_image)
+        processor = Thumbnail(256, 256)
+        new_img = processor.process(img)
+        save_image(new_img, dst_image, 'JPEG')
+        print(f"{Colors.green}OK{Colors.reset}")
+
+
+def main():
+    show_tui()
+    src = os.getcwd()
+
+    image_list = get_image_list(src)
+    create_thumbs(image_list, src)
+
+
+if __name__ == '__main__':
+    main()

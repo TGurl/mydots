@@ -1,0 +1,6 @@
+let g:netrw_dirhistmax  =10
+let g:netrw_dirhistcnt =4
+let g:netrw_dirhist_4='/home/geertje/.config/sxhkd'
+let g:netrw_dirhist_3='/home/geertje/laura/game/data/yaml'
+let g:netrw_dirhist_2='/home/geertje/.config/i3status-rs'
+let g:netrw_dirhist_1='/home/geertje/laura/game/data/yaml/game_text'

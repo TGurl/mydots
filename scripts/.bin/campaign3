@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+# -----------------------------------------------------------
+#  _______                            __             _______
+# |   _   .---.-.--------.-----.---.-|__.-----.-----|   _   |
+# |.  1___|  _  |        |  _  |  _  |  |  _  |     |___|   |
+# |.  |___|___._|__|__|__|   __|___._|__|___  |__|__|_(__   |
+# |:  1   |              |__|           |_____|     |:  1   |
+# |::.. . |                                         |::.. . |
+# `-------'                                         `-------'
+#    a simple script that implenets dmenu to start a video
+#               or play a playlist of videos.
+# -----------------------------------------------------------
+
+from functions import *
+
+def main():
+    campaign = 'campaign3'
+    path = f"/data/videos/criticalrole/{campaign}/videos"
+    extensions = ['.mp4','.mkv','.webm']
+    videos = get_files(path, extensions)
+    videos.sort()
+    videos.insert(0, 'Play All')
+    result = run_dmenu(videos, prompt='Campaign3')
+    run_mpv(result, path)
+
+
+if __name__ == "__main__":
+    main()

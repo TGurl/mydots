@@ -1,0 +1,117 @@
+#!/usr/bin/env python
+
+import os
+from PIL import Image
+
+class Colors:
+    """
+    Colors for the CLI
+    Usage:
+        print(colors.fgRed + "Text" + colors.reset)
+    """
+    reset = "\033[0m"
+    # Black
+    fgBlack = "\033[30m"
+    fgBrightBlack = "\033[30;1m"
+    bgBlack = "\033[40m"
+    bgBrightBlack = "\033[40;1m"
+    # Red
+    fgRed = "\033[31m"
+    fgBrightRed = "\033[31;1m"
+    bgRed = "\033[41m"
+    bgBrightRed = "\033[41;1m"
+    # Green
+    fgGreen = "\033[32m"
+    fgBrightGreen = "\033[32;1m"
+    bgGreen = "\033[42m"
+    bgBrightGreen = "\033[42;1m"
+    # Yellow
+    fgYellow = "\033[33m"
+    fgBrightYellow = "\033[33;1m"
+    bgYellow = "\033[43m"
+    bgBrightYellow = "\033[43;1m"
+    # Blue
+    fgBlue = "\033[34m"
+    fgBrightBlue = "\033[34;1m"
+    bgBlue = "\033[44m"
+    bgBrightBlue = "\033[44;1m"
+    # Magenta
+    fgMagenta = "\033[35m"
+    fgBrightMagenta = "\033[35;1m"
+    bgMagenta = "\033[45m"
+    bgBrightMagenta = "\033[45;1m"
+    # Cyan
+    fgCyan = "\033[36m"
+    fgBrightCyan = "\033[36;1m"
+    bgCyan = "\033[46m"
+    bgBrightCyan = "\033[46;1m"
+    # White
+    fgWhite = "\033[37m"
+    fgBrightWhite = "\033[37;1m"
+    bgWhite = "\033[47m"
+    bgBrightWhite = "\033[47;1m"
+
+
+def create_image_list():
+    cwd = os.getcwd()
+    jpg = [f for f in os.listdir(cwd) if f.endswith('.jpg')]
+    png = [f for f in os.listdir(cwd) if f.endswith('.png')]
+    imagelist = []
+    imagelist.extend(jpg)
+    imagelist.extend(png)
+    return imagelist
+
+
+def convertpng():
+    cwd = os.getcwd()
+    png = [f for f in os.listdir(cwd) if f.endswith('.png')]
+
+    if len(png):
+        message(f"Converting PNG to JPG...")
+        os.system("mogrify -format jpg *.png")
+        os.system("rm *.png")
+    else:
+        error("No PNG images found.")
+
+
+def message(msg):
+    col = Colors.fgBrightYellow
+    res = Colors.reset
+    print(f"{col}==>{res} {msg}")
+
+
+def error(msg):
+    col = Colors.fgBrightRed
+    res = Colors.reset
+    print(f"{col}==>{res} {msg}")
+
+
+def main():
+    os.system('clear')
+    print(f"{Colors.fgGreen}-= Resizer =-{Colors.reset}")
+    convertpng()
+
+    count = 0
+    imagelist = create_image_list()
+    if len(imagelist) == 0:
+        print("Sorry, no images found.")
+        exit()
+
+    message(f"Processing...")
+    for img in imagelist:
+        image = Image.open(img)
+        width, height = image.size
+
+        if height != 1080 or width != 1920:
+            old_image = f"old-{img}"
+            new_image = image.resize((1920, 1080))
+            os.rename(img, old_image)
+            new_image.save(img)
+            os.unlink(old_image)
+            count += 1
+
+    message(f"Number of images resized: {Colors.fgBrightGreen}{count}{Colors.reset}")
+    print()
+
+if __name__ == '__main__':
+    main()

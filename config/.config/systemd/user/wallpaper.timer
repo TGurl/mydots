@@ -1,0 +1,10 @@
+[Unit]
+Description=Change wallpaper every 4 hours
+
+[Timer]
+OnActiveSec=0sec
+OnUnitActiveSec=480min
+AccuracySec=500msec
+
+[Install]
+WantedBy=X.target

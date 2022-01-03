@@ -1,0 +1,127 @@
+#!/usr/bin/env python
+
+import os
+from subprocess import Popen, PIPE
+
+
+class SDDMThemer:
+    def __init__(self):
+        self.sddm = '/etc/sddm.conf.d/sddm.conf'
+        self.themes = '/usr/share/sddm/themes'
+        self.userdir = os.path.expanduser('~')
+
+
+    def read_pword(self):
+        pword_file = '.config/ranwall/pword.txt'
+        path = os.path.join(self.userdir, pword_file)
+        with open(path, 'r') as file:
+            pword = file.read().splitlines()[0]
+        return pword
+
+    def list_folders(self):
+        data = []
+        # [os.path.join(d, o) for o in os.listdir(d)
+        #            if os.path.isdir(os.path.join(d,o))]
+        for folder in os.listdir(self.themes):
+            data.append(folder)
+        data.sort()
+        return data
+
+
+    def show_available_themes(self):
+        c = ''
+        print('Available themes:')
+        print()
+        themes = self.list_folders()
+        for c, name in enumerate(themes):
+            t = c + 1
+            print(f"\t{t:2d}. {name}")
+
+        print()
+        print(f"\t0. do not change theme")
+        print()
+        return c, themes
+
+
+    def read_sddm_conf(self):
+        with open(self.sddm , 'r') as conf:
+            data = conf.read().splitlines()
+        return data
+
+
+    def get_current_theme(self):
+        current = ''
+        aline = ''
+        for line in self.read_sddm_conf():
+            if line.startswith('Current='):
+                aline = line
+                current = line.split('=')[-1]
+        return current, aline
+
+
+    def do_sudo_cmd(self, command):
+        pword = self.read_pword()
+        p = Popen(command, stdin=PIPE, stderr=PIPE,
+                universal_newlines=True)
+        _ = p.communicate(pword + "\n")[1]
+
+
+    def set_new_theme(self, new_theme):
+        print()
+        print(f"\tSetting '{new_theme}' as the new theme.")
+        _, line = self.get_current_theme()
+        args = ['sudo', '-S']
+        #backup = self.sddm + ".bak"
+        #copy_cmd = f"cp {self.sddm} {backup}".split()
+        new_line = f"Current={new_theme}"
+        sed_cmd = f"sed -i s/{line}/{new_line}/g {self.sddm}".split()
+
+        #self.do_sudo_cmd(args + copy_cmd)
+        self.do_sudo_cmd(args + sed_cmd)
+
+
+def titler(sddm):
+    res = "\033[0m"
+    col = "\033[32;1m"
+
+    os.system('clear')
+    line = 37 * "-"
+    ct, _ = sddm.get_current_theme()
+
+    print(f"{13 * ' '}SDDM Themer")
+    print(f"{line}")
+    print(f"Current theme is set to: {col}{ct}{res}")
+    print(f"{line}")
+    print()
+
+
+def main():
+    sddm = SDDMThemer()
+    titler(sddm)
+    count, themes = sddm.show_available_themes()
+
+    ans = ''
+    answered = False
+    while not answered:
+        ans = input("Which theme do you want to use? : ")
+        if not ans.isdigit():
+            print("> Please answer with any of the numbers above.")
+            print()
+        elif (int(ans) - 1) > int(count):
+            print("> That theme doesn't exist...")
+            print()
+        else:
+            answered = True
+
+
+    if int(ans) == 0:
+        print()
+        print('Bye...')
+        exit()
+    else:
+        new_theme = themes[int(ans) - 1]
+        sddm.set_new_theme(new_theme)
+
+
+if __name__ == '__main__':
+    main()

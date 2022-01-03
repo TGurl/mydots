@@ -1,0 +1,42 @@
+#!/usr/bin/env python
+
+import os
+import random
+from shutil import copy2, get_terminal_size
+from colors import *
+
+def clear():
+    os.system('clear')
+
+
+def wait_for_enter():
+    _ = input('Press <ENTER>...')
+
+
+def show_title():
+    yel = Colors.fgBrightYellow
+    res = Colors.reset
+
+    title = " WRTR "
+
+    cols = get_terminal_size().columns
+    spcs = int((cols - len(title)) / 2) * "─"
+    print(f"{yel}{spcs}{title}{spcs}{res}")
+    print()
+
+
+def readlist(filename):
+    home = os.path.expanduser("~")
+    path = f"{home}/.config/share/wrtr/{filename}.lst"
+    data = []
+    with open(path, 'r') as file:
+        data = file.read().splitlines()
+    return data
+
+
+def main():
+    show_title()
+
+
+if __name__ == "__main__":
+    main()

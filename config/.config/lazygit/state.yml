@@ -1,0 +1,22 @@
+lastupdatecheck: 0
+recentrepos:
+- /data/mydots
+- /data/github/dotfiles
+- /home/geertje/Pictures/walls
+- /data/pictures/walls
+- /home/geertje/laura/game
+- /data/github/laura-game
+- /home/geertje/laura/snippets
+- /data/github/suckless
+- /home/geertje/trans-sddm-theme
+- /data/old_projects/MyStories
+- /data/www/stories
+- /home/geertje/laura/Laura
+- /home/geertje/Projects
+- /data/projects
+- /home/geertje/.config/nvim
+- /home/geertje/Projects/MyStories
+startuppopupversion: 5
+customcommandshistory:
+- q
+hidecommandlog: false
