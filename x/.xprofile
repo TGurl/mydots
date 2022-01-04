@@ -30,8 +30,8 @@ export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
 
 # Compositor
-#picom -b
-picom --config $HOME/.config/picom/picom-ibhagwan.conf &
+picom -b
+#picom --config $HOME/.config/picom/picom-ibhagwan.conf &
 
 # Hide mouse when typing
 xbanish &

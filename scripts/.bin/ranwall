@@ -57,7 +57,7 @@ def read_folder(folders):
 
 def generate_wallpaperlist():
     if Settings.walltype.lower() == 'all':
-        walls = read_folder(['sfw', 'nsfw'])
+        walls = read_folder(['sfw', 'nsfw', 'xmas'])
     else:
         walls = read_folder([Settings.walltype])
     return walls
@@ -103,6 +103,6 @@ def main(category):
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("ERROR:")
-        print("  --> Please specify: all, sfw or nsfw")
+        print("  --> Please specify: all, xmas, sfw or nsfw")
         sys.exit(1)
     main(sys.argv[1])
