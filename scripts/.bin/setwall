@@ -13,14 +13,7 @@ class Settings:
     walldir: str
     current: str
     categories: list
-
-
-def initialize():
-    Settings.homedir = os.path.expanduser("~")
-    Settings.imagedir = os.path.join(Settings.homedir, 'Pictures')
-    Settings.walldir = os.path.join(Settings.imagedir, 'walls')
-    Settings.categories = ['sfw', 'nsfw', 'xmas']
-    Settings.sddm = '/usr/share/sddm/themes/mywall/Backgrounds/mywall.png'
+    walls: list
 
 
 def set_sddm_background(wallpaper):
@@ -41,11 +34,17 @@ def set_sddm_background(wallpaper):
             stderr=PIPE, universal_newlines=True)
         _ = p.communicate(pword + '\n')[1]
     else:
-        logging.error("Could not read password file!")
         sys.exit(1)
 
 
-def get_current():
+def initialize():
+    Settings.homedir = os.path.expanduser("~")
+    Settings.imagedir = os.path.join(Settings.homedir, 'Pictures')
+    Settings.walldir = os.path.join(Settings.imagedir, 'walls')
+    Settings.categories = ['sfw', 'nsfw', 'xmas']
+    Settings.sddm = '/usr/share/sddm/themes/mywall/Backgrounds/mywall.png'
+    
+    # --- Get current wallpaper from .fehbg
     fehbg = os.path.join(Settings.homedir, '.fehbg')
     with open(fehbg, 'r') as file:
         data = file.read().splitlines()
@@ -54,58 +53,21 @@ def get_current():
     Settings.current = current
 
 
-def generate_wallpaper_list():
-    data = []
-    for category in Settings.categories:
-        path = os.path.join(Settings.walldir, category)
-        for path, _, files in os.walk(path):
-            for file in files:
-                full = os.path.join(path, file)
-                data.append(full)
-    data.sort()
-    return data
-
-
-def set_wallpaper():
-    def get_filename(walls):
-        return walls[new_index].split('/')[-1]
-
-    index = 0
-    forbidden = ['README.md']
-
-    walls = generate_wallpaper_list()
-    for wall in walls:
-        if Settings.current in wall:
-            index = walls.index(wall)
+def determine_next():
+    print(Settings.current)
+    prefix = Settings.current.split('-')[0]
+    number = Settings.current.split('-')[1].split('.')[0]
+    ext = Settings.current.split('-')[1].split('.')[1]
+    next = int(number) + 1
+    new = f"{prefix}-{next:04d}.{ext}"
     
-    new_index = index + 1
+    print(new)
 
-    
-    if new_index > len(walls) - 1:
-        new_index = 0
-        filename = get_filename(walls)
-        while 'README' in filename:
-            new_index += 1
-            filename = get_filename(walls)
-    else:
-        filename = get_filename(walls)
-        while 'README' in filename:
-            new_index += 1
-            filename = get_filename(walls)
-    
-    new = walls[new_index]
-    cmd = f"feh --bg-scale {new}"
-    os.system(cmd)
-    set_sddm_background(new)
-    print(f"Number of wallpapers: {len(walls) - 1}")
-    print(f"Index: {new_index}")
-    print(f"Wallpaper: {new}")
 
 
 def main():
     initialize()
-    get_current()
-    set_wallpaper()
+    determine_next()
 
 
 if __name__ == "__main__":
