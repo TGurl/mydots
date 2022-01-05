@@ -67,16 +67,39 @@ def generate_wallpaper_list():
 
 
 def set_wallpaper():
+    def get_filename(walls):
+        return walls[new_index].split('/')[-1]
+
     index = 0
+    forbidden = ['README.md']
+
     walls = generate_wallpaper_list()
     for wall in walls:
         if Settings.current in wall:
             index = walls.index(wall)
+    
+    new_index = index + 1
 
-    new = walls[int(index) + 1]
+    
+    if new_index > len(walls) - 1:
+        new_index = 0
+        filename = get_filename(walls)
+        while 'README' in filename:
+            new_index += 1
+            filename = get_filename(walls)
+    else:
+        filename = get_filename(walls)
+        while 'README' in filename:
+            new_index += 1
+            filename = get_filename(walls)
+    
+    new = walls[new_index]
     cmd = f"feh --bg-scale {new}"
     os.system(cmd)
     set_sddm_background(new)
+    print(f"Number of wallpapers: {len(walls) - 1}")
+    print(f"Index: {new_index}")
+    print(f"Wallpaper: {new}")
 
 
 def main():
