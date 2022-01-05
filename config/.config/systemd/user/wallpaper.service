@@ -4,4 +4,4 @@ Description=Change wallpaper at regular intervals
 [Service]
 Type=oneshot
 Environment=DISPLAY=:0.0
-ExecStart=/home/geertje/.bin/ranwall nsfw
+ExecStart=/home/geertje/.bin/setwall

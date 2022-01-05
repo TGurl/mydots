@@ -1,0 +1,89 @@
+#!/usr/bin/env python
+
+import os
+import sys
+from subprocess import Popen, PIPE
+from dataclasses import dataclass
+
+
+@dataclass
+class Settings:
+    homedir: str
+    iamgedir: str
+    walldir: str
+    current: str
+    categories: list
+
+
+def initialize():
+    Settings.homedir = os.path.expanduser("~")
+    Settings.imagedir = os.path.join(Settings.homedir, 'Pictures')
+    Settings.walldir = os.path.join(Settings.imagedir, 'walls')
+    Settings.categories = ['sfw', 'nsfw', 'xmas']
+    Settings.sddm = '/usr/share/sddm/themes/mywall/Backgrounds/mywall.png'
+
+
+def set_sddm_background(wallpaper):
+    pword = ""
+    pword_file = '.config/ranwall/pword.txt'
+    path = os.path.join(Settings.homedir, pword_file)
+    with open(path, 'r') as file:
+        pword = file.read().splitlines()[0]
+
+    if pword:
+        dst = Settings.sddm
+        if '.png' in wallpaper:
+            cmd = f"cp {wallpaper} {dst}".split()
+        else:
+            cmd = f"convert {wallpaper} {dst}".split()
+        args = ['sudo', '-S']
+        p = Popen(args + cmd, stdin=PIPE,
+            stderr=PIPE, universal_newlines=True)
+        _ = p.communicate(pword + '\n')[1]
+    else:
+        logging.error("Could not read password file!")
+        sys.exit(1)
+
+
+def get_current():
+    fehbg = os.path.join(Settings.homedir, '.fehbg')
+    with open(fehbg, 'r') as file:
+        data = file.read().splitlines()
+    current = data[-1].split(' ')[-2].split('/')[-1]
+    current = current.replace("'", "")
+    Settings.current = current
+
+
+def generate_wallpaper_list():
+    data = []
+    for category in Settings.categories:
+        path = os.path.join(Settings.walldir, category)
+        for path, _, files in os.walk(path):
+            for file in files:
+                full = os.path.join(path, file)
+                data.append(full)
+    data.sort()
+    return data
+
+
+def set_wallpaper():
+    index = 0
+    walls = generate_wallpaper_list()
+    for wall in walls:
+        if Settings.current in wall:
+            index = walls.index(wall)
+
+    new = walls[int(index) + 1]
+    cmd = f"feh --bg-scale {new}"
+    os.system(cmd)
+    set_sddm_background(new)
+
+
+def main():
+    initialize()
+    get_current()
+    set_wallpaper()
+
+
+if __name__ == "__main__":
+    main()

@@ -1,9 +1,9 @@
 [Unit]
-Description=Change wallpaper every 15 minutes
+Description=Change wallpaper every 60 minutes
 
 [Timer]
 OnActiveSec=0sec
-OnUnitActiveSec=15min
+OnUnitActiveSec=60min
 AccuracySec=500msec
 
 [Install]
