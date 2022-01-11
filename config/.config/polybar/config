@@ -60,9 +60,11 @@ font-3 = Font Awesome 5 Free:pixelsize=12;2
 font-4 = Font Awesome 5 Free Solid:pixelsize=12;2
 font-5 = Font Awesome 5 Brands:pixelsize=12;2
 
+enable-ipc = true
+
 modules-left = bspwm i3
 modules-center = xwindow
-modules-right = filesystem pulseaudio memory cpu pacman-updates date powermenu
+modules-right = filesystem pulseaudio memory cpu package-updates-trigger package-updates date powermenu
 
 separator = |
 tray-position = none
@@ -82,6 +84,15 @@ wm-restack = bspwm
 
 cursor-click = pointer
 eursor-scroll = ns-resize
+
+[module/package-updates]
+type = custom/ipc
+hook-0 = ~/.config/polybar/package-updates
+
+[module/package-updates-trigger]
+type = custom/script
+exec = polybar-msg hook package-updates 1 &>/dev/null
+interval = 1200
 
 [module/pacman-updates]
 type = custom/script

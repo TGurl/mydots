@@ -10,7 +10,7 @@ def rename_files(files, prefix, startat):
         _, extension = os.path.splitext(file)
         new_name = f"{prefix}-{startat:04d}{extension}"
         print(f"  ==> {file} -> {new_name}")
-        os.system(f"mv {file} {new_name}")
+        os.system(f"mv '{file}' '{new_name}'")
         startat += 1
 
     total = startat - started
@@ -19,9 +19,11 @@ def rename_files(files, prefix, startat):
 
 def getdirlist(folder):
     jpg = [f for f in os.listdir(folder) if f.endswith('.jpg')]
+    jpeg = [f for f in os.listdir(folder) if f.endswith('.jpeg')]
     png = [f for f in os.listdir(folder) if f.endswith('.png')]
     data = []
     data.extend(jpg)
+    data.extend(jpeg)
     data.extend(png)
     return data
 

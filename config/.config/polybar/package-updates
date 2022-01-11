@@ -1,0 +1,37 @@
+#!/bin/sh
+format() {
+  if [ "$1" -eq 0 ]; then
+    echo "-"
+  else
+    text="$1 update"
+    if [ "$1" -gt 1 ]; then
+      text="${text}s"
+    fi
+    echo "$text"
+  fi
+}
+
+if pacman -Qs yay > /dev/null ; then
+  helper='yay -Qum'
+elif pacman -Qs paru > /dev/null ; then
+  helper='paru -Qua'
+fi
+  
+
+if ! updates_arch="$(checkupdates | wc -l)"; then
+  updates_arch=0
+fi
+
+if ! updates_aur="$($helper 2>/dev/null | wc -l)"; then
+  updates_aur=0
+fi
+
+updates="$((updates_arch + updates_aur))"
+
+if [ "$updates" -gt 0 ]; then
+  #echo "  ($(format $updates_arch)/$(format $updates_aur))"
+  echo "  $(format $updates)"
+else
+  #echo "No updates"
+  echo
+fi

@@ -42,10 +42,12 @@ def check_file(filename):
     return False
 
 
-def read_folder(folders):
+def read_folder(folders, subfolder=""):
     data = []
     for folder in folders:
         start_path = os.path.join(Settings.walldir, folder)
+        if subfolder == 'girls':
+            start_path = os.path.join(start_path, subfolder)
         for path, _, files in os.walk(start_path):
             for filename in files:
                 if not check_file(filename):
@@ -58,6 +60,8 @@ def read_folder(folders):
 def generate_wallpaperlist():
     if Settings.walltype.lower() == 'all':
         walls = read_folder(['sfw', 'nsfw', 'xmas'])
+    elif Settings.walltype.lower() == 'girls':
+        walls = read_folder(['nsfw'], 'girls')
     else:
         walls = read_folder([Settings.walltype])
     return walls
@@ -103,6 +107,6 @@ def main(category):
 if __name__ == '__main__':
     if len(sys.argv) < 2:
         print("ERROR:")
-        print("  --> Please specify: all, xmas, sfw or nsfw")
+        print("  --> Please specify: all, girls,nsfw or sfw")
         sys.exit(1)
     main(sys.argv[1])

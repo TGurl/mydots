@@ -1,10 +1,3 @@
--- available schemes
---        darkplus
---        onedarker
---        tokyonight
-vim.g.tokyonight_style = "storm"
-vim.g.tokyonight_transparent = "false"
-
 vim.cmd [[
 try
   colorscheme darkplus

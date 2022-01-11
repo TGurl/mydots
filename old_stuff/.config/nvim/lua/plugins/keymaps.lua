@@ -6,6 +6,14 @@
 local map = vim.api.nvim_set_keymap
 local default_opts = {noremap = true, silent = true}
 local cmd = vim.cmd
+local term_opts = { silent = true }
+
+--------------------------------------------------------------
+-- Remap space as leader key
+--------------------------------------------------------------
+map("", "<Space>", "<Nop>", default_opts)
+vim.g.mapleader = " "
+vim.g.maplocalleader = " "
 
 --------------------------------------------------------------
 -- Neovim shortcuts
@@ -45,7 +53,7 @@ map('n', '<leader>q', ':quitall<CR>', default_opts)
 -- Applications & Plugins shortcuts
 --------------------------------------------------------------
 -- open terminal
-map('n', '<leader>t', ':Term<CR>', {noremap = true})
+-- map('n', '<leader>t', ':Term<CR>', {noremap = true})
 
 -- nvim-tree
 ---- open/close

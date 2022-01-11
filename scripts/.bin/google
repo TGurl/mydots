@@ -1,0 +1,22 @@
+#!/usr/bin/env python
+
+import os
+import sys
+
+
+def main(arg):
+    query = ''
+    cmd = "links https://www.google.com/search\?q="
+    for a in arg:
+        query += f"{a} "
+    query = query.strip()
+    query = query.replace(' ', '+')
+    cmd += query
+    os.system(cmd)
+
+
+if __name__ == "__main__":
+    if len(sys.argv) < 2:
+        print("You didn't give me anything to search for...")
+        sys.exit(1)
+    main(sys.argv[1:])
