@@ -1,0 +1,95 @@
+#!/usr/bin/env python
+
+import os
+import sys
+from random import randint
+from subprocess import Popen, PIPE
+
+def get_current_wallpaper():
+    userdir = os.path.expanduser('~')
+    path = os.path.join(userdir, '.fehbg')
+    with open(path, 'r') as feh:
+        data = feh.read().splitlines()
+    f = data[1].split(" ")[-2].split("/")[-1]
+    f = f.replace("'", "")
+    return f
+
+
+def get_wall_list():
+    walls = []
+    path = '/data/pictures/walls/nsfw/girls'
+    for (_,_,filenames) in os.walk(path):
+        walls.extend(filenames)
+        break
+    walls.sort()
+    return walls
+
+
+def get_number(filename):
+    temp = filename.split('.')[0]
+    temp = temp.split('-')[1]
+    return temp
+
+
+def change_sddm(wallpaper):
+    pword = ""
+    userdir = os.path.expanduser('~')
+    pword_file = os.path.join(userdir, ".config/ranwall/pword.txt")
+    with open(pword_file, 'r') as file:
+        pword = file.read().splitlines()[0]
+
+    if pword:
+        dst = '/usr/share/sddm/themes/mywall/Backgrounds/mywall.png'
+        if '.png' in wallpaper:
+            cmd = f"cp {wallpaper} {dst}".split()
+        else:
+            cmd = f"convert {wallpaper} {dst}".split()
+        args = ['sudo', '-S']
+        p = Popen(args + cmd, stdin=PIPE,
+            stderr=PIPE, universal_newlines=True)
+        _ = p.communicate(pword + '\n')[1]
+    else:
+        print('ERROR: Could not read password file!')
+        sys.exit(1)
+
+
+def send_notify(msg, urgency='low'):
+    cmd = f"notify-send -u {urgency} {msg}"
+    os.system(cmd)
+
+
+def main():
+    new = 1
+    path = '/data/pictures/walls/nsfw/girls'
+    do_notify = True
+    walls = get_wall_list()
+    total = len(walls) - 1
+    current = get_current_wallpaper()
+    if current == 'choosing-wallpaper.jpg':
+        new = randint(1, total+1)
+    else:
+        number = get_number(current)
+        new = int(number) + 1
+        if new > total:
+            new = 1
+
+    new_wall = f"girls-{new:04}.jpg"
+
+    while new_wall not in walls:
+        msg = f"{new_wall} does not exist."
+        send_notify(msg, urgency='critical')
+        new +=1
+
+    path = os.path.join(path, new_wall)
+    cmd = f"feh --bg-scale {path}"
+    #print(f"Maximum: {total}")
+    #print(f"New wallpaper: {path}")
+    
+    change_sddm(path)
+    os.system(cmd)
+    if do_notify:
+        send_notify(f"{new_wall}")
+
+
+if __name__ == "__main__":
+    main()

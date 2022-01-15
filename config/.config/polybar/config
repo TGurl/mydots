@@ -62,13 +62,14 @@ font-5 = Font Awesome 5 Brands:pixelsize=12;2
 
 enable-ipc = true
 
-modules-left = bspwm i3
+modules-left = bspwm
 modules-center = xwindow
 modules-right = filesystem pulseaudio memory cpu package-updates-trigger package-updates date powermenu
 
 separator = |
-tray-position = none
+tray-position = right
 tray-padding = 2
+tray-maxsize = 16
 ;tray-background = #0063ff
 
 wm-restack = bspwm

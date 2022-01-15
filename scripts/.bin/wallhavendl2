@@ -163,10 +163,7 @@ def questionaire():
         print("Okay, okay, okay. Bye!")
         exit()
 
-    maxcount = input("How many rounds should I search for? [5] : ").lower()
-    if maxcount == "":
-        maxcount = 5
-
+    maxcount = input("How many rounds should I search for? : ").lower()
     Settings.query = query.lower().strip()
     Settings.general = yesno("Enable General? : ", True)
     Settings.anime = yesno("Enable Anime? :", False)
@@ -266,7 +263,7 @@ def show_title():
     print("--------------------------------------")
 
 
-def main_loop():
+def main():
     gre = Colors.fgBrightGreen
     yel = Colors.fgBrightYellow
     res = Colors.reset
@@ -296,13 +293,6 @@ def main_loop():
     clear()
     show_title()
     print("Done!")
-
-
-def main():
-    running = True
-    while running:
-        main_loop()
-        running = yesno("Another round?", True)
 
 
 if __name__ == "__main__":

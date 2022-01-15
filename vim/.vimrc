@@ -35,6 +35,7 @@ set hlsearch
 set incsearch
 set lazyredraw
 set magic
+set spell
 set showmatch
 set mat=2
 set noerrorbells

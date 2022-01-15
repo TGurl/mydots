@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from shutil import get_terminal_size
 from argparse import ArgumentParser, SUPPRESS
 from time import sleep
+from signal import signal, SIGINT
 import os
 import sys
 import urllib.request
@@ -51,6 +52,13 @@ class Constants:
     line = "─"
     dl_type = 'video'
     dl_subs = False
+
+
+def handler(signal_recieved, frame):
+    # handle any cleanup here
+    print("CTRL+C detected. Exiting...")
+    sys.exit(0)
+
 
 def title():
     os.system('clear')
@@ -110,6 +118,7 @@ def do_download(data, filename):
 
     total = len(data)
     for count, url in enumerate(data):
+        signal(SIGINT, handler) 
         os.system('clear')
         title()
         message(f"Parsing file: {yel}{filename}{res}")
